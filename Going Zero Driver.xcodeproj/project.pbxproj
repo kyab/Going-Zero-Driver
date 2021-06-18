@@ -6,9 +6,20 @@
 	objectVersion = 50;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EB699982267BA355001BC169 /* OSLog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB699981267BA355001BC169 /* OSLog.framework */; };
+		EB699985267BA6EC001BC169 /* RingBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = EB699984267BA6EB001BC169 /* RingBuffer.m */; };
+		EBAA80CA267B52F500809C1D /* GoingZeroDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = EBAA80C9267B52F500809C1D /* GoingZeroDevice.m */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		EBAA80BF267B528800809C1D /* Going Zero Driver.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Going Zero Driver.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB699981267BA355001BC169 /* OSLog.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSLog.framework; path = System/Library/Frameworks/OSLog.framework; sourceTree = SDKROOT; };
+		EB699983267BA6EB001BC169 /* RingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RingBuffer.h; sourceTree = "<group>"; };
+		EB699984267BA6EB001BC169 /* RingBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RingBuffer.m; sourceTree = "<group>"; };
+		EBAA80BF267B528800809C1D /* Going Zero Driver.driver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Going Zero Driver.driver"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBAA80C2267B528800809C1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EBAA80C8267B52F500809C1D /* GoingZeroDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GoingZeroDevice.h; sourceTree = "<group>"; };
+		EBAA80C9267B52F500809C1D /* GoingZeroDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GoingZeroDevice.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -16,24 +27,34 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB699982267BA355001BC169 /* OSLog.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EB699980267BA355001BC169 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EB699981267BA355001BC169 /* OSLog.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		EBAA80B6267B528800809C1D = {
 			isa = PBXGroup;
 			children = (
 				EBAA80C1267B528800809C1D /* Going Zero Driver */,
 				EBAA80C0267B528800809C1D /* Products */,
+				EB699980267BA355001BC169 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		EBAA80C0267B528800809C1D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EBAA80BF267B528800809C1D /* Going Zero Driver.bundle */,
+				EBAA80BF267B528800809C1D /* Going Zero Driver.driver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -42,6 +63,10 @@
 			isa = PBXGroup;
 			children = (
 				EBAA80C2267B528800809C1D /* Info.plist */,
+				EBAA80C8267B52F500809C1D /* GoingZeroDevice.h */,
+				EBAA80C9267B52F500809C1D /* GoingZeroDevice.m */,
+				EB699983267BA6EB001BC169 /* RingBuffer.h */,
+				EB699984267BA6EB001BC169 /* RingBuffer.m */,
 			);
 			path = "Going Zero Driver";
 			sourceTree = "<group>";
@@ -63,7 +88,7 @@
 			);
 			name = "Going Zero Driver";
 			productName = "Going Zero Driver";
-			productReference = EBAA80BF267B528800809C1D /* Going Zero Driver.bundle */;
+			productReference = EBAA80BF267B528800809C1D /* Going Zero Driver.driver */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -112,6 +137,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBAA80CA267B52F500809C1D /* GoingZeroDevice.m in Sources */,
+				EB699985267BA6EC001BC169 /* RingBuffer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,10 +264,11 @@
 				DEVELOPMENT_TEAM = A386R5WFZ6;
 				INFOPLIST_FILE = "Going Zero Driver/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.kyab.Going-Zero-Driver";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kyab.GoingZeroDevice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = driver;
 			};
 			name = Debug;
 		};
@@ -252,10 +280,11 @@
 				DEVELOPMENT_TEAM = A386R5WFZ6;
 				INFOPLIST_FILE = "Going Zero Driver/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.kyab.Going-Zero-Driver";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kyab.GoingZeroDevice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = driver;
 			};
 			name = Release;
 		};

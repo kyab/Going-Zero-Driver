@@ -18,6 +18,18 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>CFPlugInFactories</key>
+	<dict>
+		<key>2E0523F9-850E-4564-B3F2-66A45CB6E9F0</key>
+		<string>GoingZeroDevice_Create</string>
+	</dict>
+	<key>CFPlugInTypes</key>
+	<dict>
+		<key>443ABAB8-E7B3-491A-B985-BEB9187030DB</key>
+		<array>
+			<string>2E0523F9-850E-4564-B3F2-66A45CB6E9F0</string>
+		</array>
+	</dict>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>
