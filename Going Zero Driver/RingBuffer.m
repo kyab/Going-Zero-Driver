@@ -343,8 +343,8 @@
 -(void)resetBuffer{
     _playFrame = 0;
     _recordFrame = 0;
-//    bzero(_leftBuf,sizeof(float)*RING_SIZE_SAMPLE);
-//    bzero(_rightBuf,sizeof(float)*RING_SIZE_SAMPLE);
+    bzero(_leftBuf,sizeof(float)*RING_SIZE_SAMPLE);
+    bzero(_rightBuf,sizeof(float)*RING_SIZE_SAMPLE);
 }
 
 -(void)follow{

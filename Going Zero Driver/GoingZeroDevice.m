@@ -233,6 +233,9 @@ void *GoingZeroDevice_Create(CFAllocatorRef inAllocator, CFUUIDRef inRequestedTy
     if(CFEqual(inRequestedTypeUUID, kAudioServerPlugInTypeUUID))
     {
         g_Ring = [[RingBuffer alloc] init];
+        for (int i = 0; i < 44100*2; i++){
+            g_buffer[i] = 0.0f;
+        }
         theAnswer = gAudioServerPlugInDriverRef;
     }
     return theAnswer;
@@ -4080,14 +4083,14 @@ static OSStatus    GoingZeroDevice_WillDoIOOperation(AudioServerPlugInDriverRef 
     switch(inOperationID)
     {
         case kAudioServerPlugInIOOperationReadInput:
-            DebugMsg("GoingZero : WillDoIOOperation\n");
+            DebugMsg("[GoingZeroDevice] : WillDoIOOperation(kAudioServerPlugInIOOperationReadInput)\n");
             [g_Ring resetBuffer];
             willDo = true;
             willDoInPlace = true;
             break;
             
         case kAudioServerPlugInIOOperationWriteMix:
-            DebugMsg("GoingZero : WillDoIOOperation\n");
+            DebugMsg("[GoingZeroDevice] : WillDoIOOperation(kAudioServerPlugInIOOperationWriteMix)\n");
             [g_Ring resetBuffer];
             willDo = true;
             willDoInPlace = true;
@@ -4152,14 +4155,16 @@ static OSStatus    GoingZeroDevice_DoIOOperation(AudioServerPlugInDriverRef inDr
     //    clear the buffer if this iskAudioServerPlugInIOOperationReadInput
     if(inOperationID == kAudioServerPlugInIOOperationReadInput)
     {
+//        DebugMsg("GoingZeroDevice_DoIOOperation\n");
         //    we are always dealing with a 2 channel 32 bit float buffer
 //        memset(ioMainBuffer, 0, inIOBufferFrameSize * 8);
+//        [g_Ring follow];
         float *src = [g_Ring readPtrLeft];
         if (src){
             memcpy(ioMainBuffer, src, inIOBufferFrameSize * 8);
             [g_Ring advanceReadPtrSample:inIOBufferFrameSize*2];
         }else{
-            DebugMsg("shortage\n");
+            DebugMsg("[GoingZeroDevice] shortage\n");
             memcpy(ioMainBuffer, g_buffer, inIOBufferFrameSize * 8);
         }
     }else if (inOperationID == kAudioServerPlugInIOOperationWriteMix){
