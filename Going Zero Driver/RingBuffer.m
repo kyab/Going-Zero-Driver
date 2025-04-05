@@ -15,7 +15,7 @@
     
     [self initBuffers];
     
-    _minOffsetFrame = 32;
+    _minOffsetFrame = 64;
     return self;
     
 }
@@ -266,13 +266,20 @@
     UInt32 r = _playFrame;
     
     if (w < r){
-        w += [self frames];
+        if (w < 10000 && r > RING_SIZE_SAMPLE-10000){
+            // rounding
+            w += [self frames];
+        }else{
+            // reading before write.
+            return NULL;
+        }
     }
     UInt32 off = w-r;
 
     if (off >= _minOffsetFrame){
         return &_leftBuf[_playFrame];
     }else{
+        // too near
         return NULL;
     }
 }
@@ -282,9 +289,16 @@
     UInt32 r = _playFrame;
     
     if (w < r){
-        w += [self frames];
+        if (w < 10000 && r > RING_SIZE_SAMPLE-10000){
+            // rounding
+            w += [self frames];
+        }else{
+            // reading before write.
+            return NULL;
+        }
     }
     UInt32 off = w-r;
+    
     if (off >= _minOffsetFrame){
         return &_rightBuf[_playFrame];
     }else{

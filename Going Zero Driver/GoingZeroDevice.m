@@ -24,6 +24,8 @@
 float g_buffer[44100*2];
 UInt32 g_currentPtr = 0;
 UInt32 g_currentPtrRead = 0;
+Boolean g_wasFirstWriteCalled = NO;
+Boolean g_wasFirstReadCalled = NO;
 
 RingBuffer *g_Ring = nil;
 
@@ -4087,6 +4089,8 @@ static OSStatus    GoingZeroDevice_WillDoIOOperation(AudioServerPlugInDriverRef 
             [g_Ring resetBuffer];
             willDo = true;
             willDoInPlace = true;
+            g_wasFirstWriteCalled = NO;
+            g_wasFirstReadCalled = NO;
             break;
             
         case kAudioServerPlugInIOOperationWriteMix:
@@ -4094,6 +4098,8 @@ static OSStatus    GoingZeroDevice_WillDoIOOperation(AudioServerPlugInDriverRef 
             [g_Ring resetBuffer];
             willDo = true;
             willDoInPlace = true;
+            g_wasFirstWriteCalled = NO;
+            g_wasFirstReadCalled = NO;
             break;
             
     };
@@ -4147,10 +4153,11 @@ static OSStatus    GoingZeroDevice_DoIOOperation(AudioServerPlugInDriverRef inDr
     FailWithAction(inDeviceObjectID != kObjectID_Device, theAnswer = kAudioHardwareBadObjectError, Done, "GoingZeroDevice_DoIOOperation: bad device ID");
     FailWithAction((inStreamObjectID != kObjectID_Stream_Input) && (inStreamObjectID != kObjectID_Stream_Output), theAnswer = kAudioHardwareBadObjectError, Done, "GoingZeroDevice_DoIOOperation: bad stream ID");
 
-    
+    static UInt32  readCount = 0 ;
+    static UInt32  writeCount = 0;
+    static UInt32  shortageCount = 0;
     
 //    FailWithAction(1, theAnswer = kAudioHardwareBadObjectError, Done, "GoingZeroDevice_DoIOOperation: bad stream ID")
-
     
     //    clear the buffer if this iskAudioServerPlugInIOOperationReadInput
     if(inOperationID == kAudioServerPlugInIOOperationReadInput)
@@ -4159,15 +4166,49 @@ static OSStatus    GoingZeroDevice_DoIOOperation(AudioServerPlugInDriverRef inDr
         //    we are always dealing with a 2 channel 32 bit float buffer
 //        memset(ioMainBuffer, 0, inIOBufferFrameSize * 8);
 //        [g_Ring follow];
+        if (g_wasFirstReadCalled == NO) {
+            g_wasFirstReadCalled = YES;
+            DebugMsg("[GoingZeroDevice] : FirstReadCalled. bufferFrameSize = %u \n", inIOBufferFrameSize);
+            readCount = 0;
+            shortageCount = 0;
+        }
+
+        if (readCount % 1000 == 0) {
+//            DebugMsg("[GoingZeroDevice] : 1000 Read called %{public}u, bufferFrameSize = %u \n", readCount, inIOBufferFrameSize);
+        }
+        readCount++;
+        
+
+        if ((SInt32)[g_Ring recordFrame] - (SInt32)[g_Ring playFrame] > 44100) {
+            if ([g_Ring recordFrame] > 10000){
+                DebugMsg("[GoingZeroDevice] : Fixing too far record : %u, play : %u\n", [g_Ring recordFrame], [g_Ring playFrame]);
+                [g_Ring follow];
+            }
+            
+        }
         float *src = [g_Ring readPtrLeft];
         if (src){
             memcpy(ioMainBuffer, src, inIOBufferFrameSize * 8);
             [g_Ring advanceReadPtrSample:inIOBufferFrameSize*2];
         }else{
-            DebugMsg("[GoingZeroDevice] shortage\n");
-            memcpy(ioMainBuffer, g_buffer, inIOBufferFrameSize * 8);
+            shortageCount++;
+            DebugMsg("[GoingZeroDevice] shortage, shortageCount = %{public}u, bufferFrameSize = %u \n", shortageCount, inIOBufferFrameSize);
+            memset(ioMainBuffer, 0, inIOBufferFrameSize * 8);
+//            memcpy(ioMainBuffer, g_buffer, inIOBufferFrameSize * 8);
         }
     }else if (inOperationID == kAudioServerPlugInIOOperationWriteMix){
+        if (g_wasFirstWriteCalled == NO) {
+            g_wasFirstWriteCalled = YES;
+            DebugMsg("[GoingZeroDevice] : FirstWriteCalled, bufferFrameSize = %u\n", inIOBufferFrameSize);
+            writeCount = 0;
+        }
+
+        if (writeCount % 1000 == 0) {
+//            DebugMsg("[GoingZeroDevice] : 1000 Write called %{public}u, bufferFrameSize = %u  \n", writeCount, inIOBufferFrameSize);
+        }
+        writeCount++;
+
+        
         float *dst = [g_Ring writePtrLeft];
         memcpy(dst, ioMainBuffer, inIOBufferFrameSize * 8);
         [g_Ring advanceWritePtrSample:inIOBufferFrameSize*2];
@@ -4201,4 +4242,4 @@ Done:
 
 //Book-Pro:/Library/Audio/Plug-Ins/HAL]$ sudo rm -rf Going\ Zero\ Driver.driver/
 //[koji@MacBook-Pro:/Library/Audio/Plug-Ins/HAL]$ sudo cp -rf /Users/koji/work/Going\ Zero\ Driver/DerivedData/Going\ Zero\ Driver/Build/Products/Debug/Going\ Zero\ Driver.driver .
-//[koji@MacBook-Pro:/Library/Audio/Plug-Ins/HAL]$ sudo launchctl kickstart -k -p system/com.apple.audio.coreaudiod
+//[koji@MacBook-Pro:/Library/Audio/Plug-Ins/HAL]$ sudo killall coreaudiod
